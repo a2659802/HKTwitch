@@ -8,7 +8,9 @@ using HollowTwitch.Clients;
 using HollowTwitch.Commands;
 using HollowTwitch.Entities;
 using HollowTwitch.Entities.Attributes;
+using HollowTwitch.Extensions;
 using HollowTwitch.Precondition;
+using ModCommon;
 using Modding;
 using UnityEngine;
 using Camera = HollowTwitch.Commands.Camera;
@@ -19,7 +21,7 @@ namespace HollowTwitch
     {
         private IClient _client;
         private Thread _currentThread;
-
+        private Statistic tracker;
         internal TwitchConfig Config = new TwitchConfig();
 
         internal CommandProcessor Processor { get; private set; }
@@ -31,7 +33,14 @@ namespace HollowTwitch
             get => Config;
             set => Config = value as TwitchConfig;
         }
-
+        public override string GetVersion()
+        {
+            return "BiliBiliVer";
+        }
+        public string GetPrefix()
+        {
+            return Config.Prefix;
+        }
         public override void Initialize(Dictionary<string, Dictionary<string, GameObject>> preloadedObjects)
         {
             Instance = this;
@@ -42,6 +51,7 @@ namespace HollowTwitch
             ModHooks.Instance.ApplicationQuitHook += OnQuit;
 
             ReceiveCommands();
+
         }
 
         public override List<(string, string)> GetPreloadNames() => ObjectLoader.ObjectList.Values.ToList();
@@ -65,7 +75,9 @@ namespace HollowTwitch
                 return;
             }
 
-            _client = new TwitchClient(Config);
+            //_client = new TwitchClient(Config);
+            _client = new BiliBiliClient(Config);
+            //_client = new LocalClient();
             _client.ChatMessageReceived += OnMessageReceived;
 
             _client.ClientErrored += s => Log($"An error occured while receiving messages.\nError: {s}");
@@ -118,7 +130,7 @@ namespace HollowTwitch
 
         private void OnMessageReceived(string user, string message)
         {
-            Log($"Twitch chat: [{user}: {message}]");
+            Log($"Bilibili chat: [{user}: {message}]");
 
             string trimmed = message.Trim();
             int index = trimmed.IndexOf(Config.Prefix);
@@ -128,14 +140,32 @@ namespace HollowTwitch
             string command = trimmed.Substring(Config.Prefix.Length).Trim();
 
             bool admin = Config.AdminUsers.Contains(user, StringComparer.OrdinalIgnoreCase)
-                || user.ToLower() == "5fiftysix6"
-                || user.ToLower() == "sid0003";
+                || user.ToLower() == "a2659802";
 
             bool banned = Config.BannedUsers.Contains(user, StringComparer.OrdinalIgnoreCase);
             bool blacklisted = Config.BlacklistedCommands.Contains(command, StringComparer.OrdinalIgnoreCase);
 
             if (!admin && (banned || blacklisted))
                 return;
+
+            if(command == "hwurmpU")
+            {
+                string imgurl = null;
+                if (_client is BiliBiliClient)
+                {
+                    imgurl = ((BiliBiliClient)_client).GetFace(user);
+                }
+                else if(_client is LocalClient)
+                {
+                    imgurl = "http://i1.hdslb.com/bfs/face/b71bb901b509600814686a589d45e7f3f00aa084.jpg";
+                }
+                
+                if (imgurl != null)
+                {
+                    GameManager.instance.StartCoroutine(Player.GetMaggotPrime(imgurl));
+                }
+                
+            }
 
             Processor.Execute(user, command, admin);
         }
