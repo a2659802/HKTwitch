@@ -82,6 +82,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Clients\BiliBiliClient.cs" />
+    <Compile Include="Clients\LocalClient.cs" />
     <Compile Include="CommandProcessor.cs" />
     <Compile Include="Commands\Area.cs" />
     <Compile Include="Commands\Camera.cs" />

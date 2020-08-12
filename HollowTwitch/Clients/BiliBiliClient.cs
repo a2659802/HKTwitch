@@ -61,7 +61,7 @@ namespace HollowTwitch.Clients
             url = "https://api.live.bilibili.com/xlive/web-room/v1/dM/gethistory";
             data = new Dictionary<string, string>
             {
-                {"roomid","22102251" },
+                {"roomid",config.Channel },
                 {"csrf_token","" },
                 {"csrf","" },
                 {"visit_id","" },
