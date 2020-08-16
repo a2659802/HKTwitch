@@ -12,21 +12,21 @@ namespace HollowTwitch.Clients
         private StreamReader _output;
         private StreamWriter _input;
 
-        private readonly TwitchConfig _config;
+        private readonly Config _config;
 
         public event Action<string, string> ChatMessageReceived;
         public event Action<string> RawPayload;
 
         public event Action<string> ClientErrored;
 
-        public TwitchClient(TwitchConfig config)
+        public TwitchClient(Config config)
         {
             _config = config;
             ConnectAndAuthenticate(config);
             RawPayload += ProcessMessage;
         }
 
-        private void ConnectAndAuthenticate(TwitchConfig config)
+        private void ConnectAndAuthenticate(Config config)
         {
             _client = new TcpClient("irc.twitch.tv", 6667);
 
@@ -42,9 +42,9 @@ namespace HollowTwitch.Clients
                 return;
             }
                 
-            SendMessage($"PASS oauth:{config.Token}");
-            SendMessage($"NICK {config.Username}");
-            SendMessage($"JOIN #{config.Channel}");
+            SendMessage($"PASS oauth:{config.TwitchToken}");
+            SendMessage($"NICK {config.TwitchUsername}");
+            SendMessage($"JOIN #{config.TwitchChannel}");
         }
 
         private void Reconnect(int delay)
