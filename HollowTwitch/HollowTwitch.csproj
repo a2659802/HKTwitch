@@ -97,6 +97,7 @@
     <Compile Include="Entities\Attributes\RemainingTextAttribute.cs" />
     <Compile Include="Entities\Attributes\SummaryAttribute.cs" />
     <Compile Include="IClient.cs" />
+    <Compile Include="Utils\Localization.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="ModHelpers\BindingsHelper.cs" />
     <Compile Include="Commands\Enemies.cs" />

@@ -11,6 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using DanmuJson;
 using HollowTwitch.Extensions;
+using HollowTwitch.Utils;
 
 namespace HollowTwitch.Clients
 {
@@ -25,6 +26,23 @@ namespace HollowTwitch.Clients
             this.user = nickname;
             this.time = timeline;
             this.text = text;
+
+            string tmp = text;
+
+            if (tmp != null)
+                tmp = tmp.Trim().Replace("@", "!").Replace("！", "!").Replace("+", " ");
+
+            if (tmp != null && tmp.Length > 1 && tmp.StartsWith(TwitchMod.Instance.Config.Prefix))
+            {
+                foreach (var kv in Localization.Instance.translations)
+                {
+                    if (tmp.Contains(kv.Key))
+                    {
+                        tmp = tmp.Replace(kv.Key, kv.Value);
+                    }
+                }
+                this.text = tmp;
+            }
         }
     }
 
